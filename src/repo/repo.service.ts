@@ -9,6 +9,7 @@ import { Repository } from 'typeorm';
 import { RepoCreateDto, RepoUpdateDto } from '@48-iq/uikit-dto-lib';
 import { BuildService } from 'src/build/services/build-service.interface';
 import { ComponentService } from 'src/component/component.service';
+import { BuildOptions } from 'src/build/models/build-options.interface';
 
 @Injectable()
 export class RepoService {
@@ -16,19 +17,25 @@ export class RepoService {
     @InjectMinio() private readonly minioClient: MinioClient,
     @InjectRepository(Repo) private readonly repoRepository: Repository<Repo>,
     private readonly buildService: BuildService,
-    private readonly componentService: ComponentService
+    private readonly componentService: ComponentService,
   ) {}
 
-  createNewRepo(repo: RepoCreateDto) {
-
+  async createNewRepo(args: { repo: RepoCreateDto; username: string }) {
+    const { repo, username } = args;
+    const components = await this.componentService.loadComponentsMeta(
+      repo.components,
+    );
+    const buildOptions: BuildOptions = {
+      version: repo.version,
+      components,
+      name: repo.name,
+      username,
+    };
+    const result = await this.buildService.buildAndSave(buildOptions);
   }
 
-  updateRepo(args: {
-    repoId: string;
-    update: RepoUpdateDto;
-  }) {
-    const {repoId, update} = args;
-
+  updateRepo(args: { repoId: string; update: RepoUpdateDto }) {
+    const { repoId, update } = args;
   }
 
   getRepo(repoId: string) {

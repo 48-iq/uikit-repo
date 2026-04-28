@@ -6,9 +6,7 @@ import { create, extract, Unpack } from 'tar';
 import tmp from 'tmp';
 import path from 'node:path';
 import { finished } from 'node:stream/promises';
-import typescript from '@rollup/plugin-typescript';
-import axios from 'axios';
-import resolve, { nodeResolve } from '@rollup/plugin-node-resolve';
+import { nodeResolve } from '@rollup/plugin-node-resolve';
 import commonjs from '@rollup/plugin-commonjs';
 import fs from 'node:fs';
 import babel from '@rollup/plugin-babel';
@@ -76,15 +74,25 @@ export class RollupBuildService extends BuildService {
 
     const stream = fs.createReadStream(path.join(tmpDir, 'tar.tgz'));
 
+    const repoId = `${options.username}/${options.name}-${options.version}`;
+
     await this.minio.putObject(
       MINIO_REPO_BUCKET,
-      `${options.username}/${options.name}-${options.version}.tgz`,
+      repoId,
       stream,
     );
 
     fs.rmSync(tmpDir, { recursive: true, force: true });
-    
+
     await bundle.close();
+
+    return {
+      version: options.version,
+      components: options.components,
+      name: options.name,
+      username: options.username,
+      id: repoId
+    }
   }
 
   private getEntry(tmpDir: string, options: BuildOptions) {
