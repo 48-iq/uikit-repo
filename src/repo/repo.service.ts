@@ -32,6 +32,9 @@ export class RepoService {
       username,
     };
     const result = await this.buildService.buildAndSave(buildOptions);
+
+    const entity = new Repo();
+    
   }
 
   updateRepo(args: { repoId: string; update: RepoUpdateDto }) {
