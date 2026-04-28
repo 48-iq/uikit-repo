@@ -1,12 +1,20 @@
 import { Injectable } from "@nestjs/common";
 import { Repo } from "src/postgres/entities/repo.entity";
-import RepoEntityDto from '@48-iq/uikit-dto-lib';
+import { RepoEntityDto} from '@48-iq/uikit-dto-lib';
 
 @Injectable()
 export class RepoMapper {
   constructor() {}
 
   entityToDto(entity: Repo) {
-    return new RepoEntityDto
+    return new RepoEntityDto({
+      id: entity.id,
+      description: entity.description,
+      components: entity.components.map((c) => c.id),
+    });
+  }
+
+  entityToDtos(entities: Repo[]) {
+    return entities.map((entity) => this.entityToDto(entity));
   }
 }

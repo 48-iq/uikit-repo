@@ -40,7 +40,7 @@ export class RollupBuildService extends BuildService {
       componentsPackagesJson,
     });
 
-    this.createIndexesForComponents(tmpDir, options);
+    //this.createIndexesForComponents(tmpDir, options);
 
     const bundle = await rollup({
       input: this.getEntry(tmpDir, options),
@@ -74,7 +74,7 @@ export class RollupBuildService extends BuildService {
 
     const stream = fs.createReadStream(path.join(tmpDir, 'tar.tgz'));
 
-    const repoId = `${options.username}/${options.name}-${options.version}`;
+    const repoId = `${options.username}/${options.name}/${options.version}`;
 
     await this.minio.putObject(
       MINIO_REPO_BUCKET,

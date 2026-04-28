@@ -10,12 +10,15 @@ import { RepoCreateDto, RepoUpdateDto } from '@48-iq/uikit-dto-lib';
 import { BuildService } from 'src/build/services/build-service.interface';
 import { ComponentService } from 'src/component/component.service';
 import { BuildOptions } from 'src/build/models/build-options.interface';
+import { ComponentType } from 'src/build/models/types';
+import { Component } from 'src/postgres/entities/component.entity';
 
 @Injectable()
 export class RepoService {
   constructor(
     @InjectMinio() private readonly minioClient: MinioClient,
     @InjectRepository(Repo) private readonly repoRepository: Repository<Repo>,
+    @InjectRepository(Component) private readonly componentRepository: Repository<Component>,
     private readonly buildService: BuildService,
     private readonly componentService: ComponentService,
   ) {}
@@ -25,16 +28,41 @@ export class RepoService {
     const components = await this.componentService.loadComponentsMeta(
       repo.components,
     );
+
     const buildOptions: BuildOptions = {
       version: repo.version,
       components,
       name: repo.name,
       username,
     };
+
     const result = await this.buildService.buildAndSave(buildOptions);
 
-    const entity = new Repo();
-    
+    let entity = new Repo();
+    entity.components = await this.getAndSaveComponents(components);
+    entity.description = repo.description;
+    entity.id = result.id;
+    entity.name = result.name;
+    entity.username = result.username;
+    entity.version = result.version;
+
+    entity = await this.repoRepository.save(entity);
+
+    return entity;
+  }
+
+  private async getAndSaveComponents(meta: ComponentType[]) {
+
+    let components = meta.map((m) => {
+      const entity = new Component();
+      entity.id = m.id;
+      entity.version = m.version;
+      return entity;
+    });
+
+    components = await this.componentRepository.save(components);
+
+    return components;
   }
 
   updateRepo(args: { repoId: string; update: RepoUpdateDto }) {

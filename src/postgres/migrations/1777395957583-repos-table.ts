@@ -12,7 +12,6 @@ export class ReposTable1777395957583 implements MigrationInterface {
   }
 
   public async down(queryRunner: QueryRunner): Promise<void> {
-    queryRunner.query(`
-      DROP TABLE "repos";`)
+    queryRunner.query(`DROP TABLE "repos";`);
   }
 }
