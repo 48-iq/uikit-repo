@@ -11,6 +11,8 @@ export class RepoMapper {
       id: entity.id,
       description: entity.description,
       components: entity.components.map((c) => c.id),
+      createdAt: entity.createdAt?.toISOString()??'none',
+      updatedAt: entity.updatedAt?.toISOString()??'none',
     });
   }
 
