@@ -54,6 +54,15 @@ export class RepoService {
     return entity;
   }
 
+  async getRepoByUser(username: string) {
+    const repos = await this.repoRepository
+      .createQueryBuilder('repo')
+      .where('repo.username = :username', { username })
+      .leftJoinAndSelect('repo.components', 'component')
+      .getMany();
+    return repos;
+  }
+
   private async getAndSaveComponents(meta: ComponentType[]) {
     this.logger.log('meta: ' + JSON.stringify(meta));
     let components = meta.map((m) => {

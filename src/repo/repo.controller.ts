@@ -1,4 +1,4 @@
-import { Body, Controller, Get, Param, Post, Query, Req } from '@nestjs/common';
+import { Body, Controller, Get, Param, Post, Query, Req, StreamableFile } from '@nestjs/common';
 import { RepoService } from './repo.service';
 import { RepoCreateDto } from '@48-iq/uikit-dto-lib';
 import { RepoMapper } from './repo.mapper';
@@ -10,6 +10,15 @@ export class RepoController {
     private readonly repoMapper: RepoMapper
   ) {}
 
+  @Get('/:username')
+  async getRepoByUser(
+    @Param('username') username: string
+  ) {
+    const repos = await this.repoService.getRepoByUser(username);
+    const response = this.repoMapper.entityToDtos(repos);
+    return response;
+  }
+
   @Get('/:username/:name')
   getRepo(
     @Param('username') username: string,
@@ -19,14 +28,15 @@ export class RepoController {
     return this.repoService.getRepo(repoId);
   }
 
-  @Get('/package/:useraname/:name')
-  getPackage(
+  @Get('/package/:username/:name')
+  async getPackage(
     @Param('username') username: string,
     @Param('name') name: string,
-    @Param('version') version: string
+    
   ) {
     const packageId = `${username}/${name}`;
-    return this.repoService.getPackage(packageId);
+    const file = await this.repoService.getPackage(packageId);
+    return new StreamableFile(file);
   }
 
   @Post()
