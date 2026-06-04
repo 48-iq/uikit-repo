@@ -1,0 +1,9 @@
+import { EntityDto } from 'src/common/dto/entity.dto';
+
+export class RepoEntityDto extends EntityDto {
+  name: string;
+  username: string;
+  description: string;
+  latestBuildId: string | null;
+  latestBuildVersion: number | null;
+}

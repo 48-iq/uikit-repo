@@ -1,0 +1,24 @@
+import { Injectable, OnApplicationBootstrap } from '@nestjs/common';
+import { InjectMinio } from './minio.decorator';
+import { Client } from 'minio';
+import { MINIO_COMPONENTS_BUCKET, MINIO_REPOSITORIES_BUCKET } from './constants';
+
+@Injectable()
+export class MinioInitService implements OnApplicationBootstrap {
+  constructor(@InjectMinio() private readonly minio: Client) {}
+
+  async onApplicationBootstrap() {
+    const isRepositoriesBucketExists = await this.minio.bucketExists(
+      MINIO_REPOSITORIES_BUCKET,
+    );
+    if (!isRepositoriesBucketExists) {
+      await this.minio.makeBucket(MINIO_REPOSITORIES_BUCKET);
+    }
+    const isComponentsBucketExists = await this.minio.bucketExists(
+      MINIO_COMPONENTS_BUCKET,
+    );
+    if (!isComponentsBucketExists) {
+      await this.minio.makeBucket(MINIO_COMPONENTS_BUCKET);
+    }
+  }
+}
