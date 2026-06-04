@@ -1,5 +1,6 @@
 import { EntityDto } from 'src/common/dto/entity.dto';
 import { BuildStatus } from 'src/postgres/entities/build.entity';
+import { ComponentBuildEntityDto } from './component-build-entity.dto';
 
 export class BuildEntityDto extends EntityDto {
   status: BuildStatus;
@@ -8,4 +9,5 @@ export class BuildEntityDto extends EntityDto {
   startedAt: string;
   finishedAt: string;
   repoId: string;
+  componentBuilds?: ComponentBuildEntityDto[];
 }

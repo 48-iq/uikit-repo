@@ -83,10 +83,10 @@ export class BuildService {
   async getById(buildId: string) {
     const build = await this.buildRepository.findOne({
       where: { id: buildId },
-      relations: ['repo'],
+      relations: ['repo', 'componentBuilds'],
     });
     if (!build) throw new AppError(ERROR_CODE.BUILD_NOT_FOUND);
-    return BuildMapper.toEntityResultDto(build);
+    return BuildMapper.toEntityResultDto(build, build.componentBuilds);
   }
 
   async getByFilters(dto: BuildFiltersDto) {
