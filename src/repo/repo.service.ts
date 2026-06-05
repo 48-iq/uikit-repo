@@ -74,7 +74,7 @@ export class RepoService {
   }
 
   async getByFilters(dto: RepoFiltersDto) {
-    const { username, query, skip = 0, limit = 10 } = dto;
+    const { username, query, skip = 0, limit = 10, tags } = dto;
     const startDate = dto.startDate ? new Date(dto.startDate) : new Date();
 
     let qb = this.repoRepository
@@ -87,6 +87,10 @@ export class RepoService {
       qb = qb.andWhere(`repo.username || '/' || repo.name LIKE :query`, {
         query: `%${query}%`,
       });
+    
+    if (tags) {
+      qb = qb.andWhere('repo.tags @> :tags', { tags: tags });
+    }
 
     qb = qb.orderBy('repo.createdAt', dto.sort === 'asc' ? 'ASC' : 'DESC');
 
@@ -112,6 +116,7 @@ export class RepoService {
       name: dto.name,
       username,
       description: dto.description,
+      tags: dto.tags
     });
 
     const build = await this.buildService.create({

@@ -19,6 +19,7 @@ export class RepoMapper {
     dto.updatedAt = entity.updatedAt?.toISOString() ?? '';
     dto.latestBuildId = latestBuild?.id ?? null;
     dto.latestBuildVersion = latestBuild?.version ?? null;
+    dto.tags = entity.tags;
     dto.builds = latestBuild ? [BuildMapper.toEntityDto(latestBuild)] : undefined;
     return dto;
   }

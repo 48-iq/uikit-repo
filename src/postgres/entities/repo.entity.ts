@@ -6,6 +6,7 @@ import {
   PrimaryGeneratedColumn,
 } from 'typeorm';
 import { Build } from './build.entity';
+import { RepoTag } from './repo-tag.enum';
 
 @Entity({ name: 'repos' })
 export class Repo {
@@ -23,6 +24,15 @@ export class Repo {
 
   @OneToMany(() => Build, (build) => build.repo)
   builds: Build[];
+
+  @Column({
+    type: 'enum',
+    enum: RepoTag,
+    array: true,
+    nullable: true,
+    default: [],
+  })
+  tags: RepoTag[];
 
   @CreateDateColumn({
     type: 'timestamp',
