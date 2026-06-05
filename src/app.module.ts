@@ -8,6 +8,7 @@ import { JwtModule } from '@nestjs/jwt';
 import { APP_FILTER, APP_GUARD, APP_PIPE } from '@nestjs/core';
 import { JwtGuard } from './security/jwt.guard';
 import { AllExceptionsFilter } from './errors/all-exceptions.filter';
+import { StatModule } from './stat/stat.module';
 
 @Module({
   imports: [
@@ -15,6 +16,7 @@ import { AllExceptionsFilter } from './errors/all-exceptions.filter';
     RedisModule,
     RepoModule,
     PostgresModule,
+    StatModule,
     MinioModule,
     JwtModule.registerAsync({
       imports: [ConfigModule],

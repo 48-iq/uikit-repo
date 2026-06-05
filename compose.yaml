@@ -42,7 +42,7 @@ services:
       base:
 
   build:
-    image: ghcr.io/48-iq/uikit-build:v0.0.23
+    image: ghcr.io/48-iq/uikit-build:v0.0.26
     depends_on:
       postgres:
         condition: service_healthy

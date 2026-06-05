@@ -9,10 +9,24 @@ import { RepoService } from './repo.service';
 export class RepoController {
   constructor(private readonly repoService: RepoService) {}
 
+  // @Public()
+  // @Get('/:repoId')
+  // async getById(@Param('repoId') repoId: string) {
+  //   return this.repoService.getById(repoId);
+  // }
+
   @Public()
-  @Get('/:repoId')
-  async getById(@Param('repoId') repoId: string) {
-    return this.repoService.getById(repoId);
+  @Get('/:username/:name')
+  async get(
+    @Param('username') username: string,
+    @Param('name') name: string,
+    @Query('version') version?: string,
+  ) {
+    return await this.repoService.getByNameAndUsername({
+      name,
+      username,
+      version: version ? +version : undefined,
+    });
   }
 
   @Public()

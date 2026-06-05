@@ -6,9 +6,10 @@ import { BuildController } from './build.controller';
 import { BuildLogService } from './services/build-log.service';
 import { BuildService } from './services/build.service';
 import { RollupBuildService } from './services/rollup-build.service';
+import { Load } from 'src/postgres/entities/load.entity';
 
 @Module({
-  imports: [TypeOrmModule.forFeature([Build, ComponentBuild])],
+  imports: [TypeOrmModule.forFeature([Build, ComponentBuild, Load])],
   controllers: [BuildController],
   providers: [BuildLogService, RollupBuildService, BuildService],
   exports: [BuildService],

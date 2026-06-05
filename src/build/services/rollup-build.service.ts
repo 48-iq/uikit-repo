@@ -103,10 +103,9 @@ export class RollupBuildService {
         const dir = path.join(distDir, 'components', cb.componentUsername, cb.componentName);
         fs.mkdirSync(dir, { recursive: true });
 
-        const tgzName = `${cb.componentUsername}/${cb.componentName}/${cb.buildVersion}.tgz`;
-        const stream = await this.minio.getObject(MINIO_COMPONENTS_BUCKET, tgzName);
+        const stream = await this.minio.getObject(MINIO_COMPONENTS_BUCKET, cb.packageFilename);
         await finished(stream.pipe(extract({ cwd: dir })));
-        await this.buildLog.append(buildId, `Extracted: ${tgzName}`, 'info');
+        await this.buildLog.append(buildId, `Extracted: ${cb.packageFilename}`, 'info');
 
         const pkg = JSON.parse(fs.readFileSync(path.join(dir, 'package.json'), 'utf-8'));
         const entries = fs.readdirSync(dir, { recursive: true, encoding: 'utf-8' });

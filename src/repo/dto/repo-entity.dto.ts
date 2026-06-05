@@ -1,3 +1,4 @@
+import { BuildEntityDto } from 'src/build/dto/build-entity.dto';
 import { EntityDto } from 'src/common/dto/entity.dto';
 
 export class RepoEntityDto extends EntityDto {
@@ -6,4 +7,5 @@ export class RepoEntityDto extends EntityDto {
   description: string;
   latestBuildId: string | null;
   latestBuildVersion: number | null;
+  builds?: BuildEntityDto[];
 }

@@ -4,4 +4,5 @@ export class ComponentBuildEntityDto {
   name: string;
   username: string;
   version: number;
+  buildId: string;
 }

@@ -10,6 +10,7 @@ import { RepoCreateDto } from './dto/repo-create.dto';
 import { RepoFiltersDto } from './dto/repo-filters.dto';
 import { RepoNewVersionDto } from './dto/repo-new-version.dto';
 import { RepoMapper } from './repo.mapper';
+import { ComponentBuild } from 'src/postgres/entities/component-build.entity';
 
 @Injectable()
 export class RepoService {
@@ -18,6 +19,7 @@ export class RepoService {
   constructor(
     @InjectRepository(Repo) private readonly repoRepository: Repository<Repo>,
     private readonly buildService: BuildService,
+    @InjectRepository(Build) private readonly buildRepository: Repository<Build>,
   ) {}
 
   async getById(repoId: string) {
@@ -41,6 +43,33 @@ export class RepoService {
     if (!repo) throw new AppError(ERROR_CODE.BUILD_NOT_FOUND);
 
     const latestBuild = (repo as Repo & { latestBuild?: Build }).latestBuild;
+    return RepoMapper.toEntityResultDto(repo, latestBuild);
+  }
+
+  async getByNameAndUsername(args: {
+    name: string;
+    username: string;
+    version?: number;
+  }) {
+    const repo = await this.repoRepository.findOne({
+      where: { name: args.name, username: args.username },
+    });
+    if (!repo) throw new AppError(ERROR_CODE.REPO_NOT_FOUND);
+
+    let buildQuery = this.buildRepository
+      .createQueryBuilder('build')
+      .leftJoinAndSelect('build.componentBuilds', 'componentBuild')
+      .where('build.repoId = :repoId', { repoId: repo.id })
+      .andWhere('build.status = :status', { status: BuildStatus.SUCCESS });
+
+    if (args.version != null) {
+      buildQuery = buildQuery.andWhere('build.version = :version', { version: args.version });
+    } else {
+      buildQuery = buildQuery.orderBy('build.version', 'DESC');
+    }
+
+    const latestBuild = await buildQuery.getOne();
+
     return RepoMapper.toEntityResultDto(repo, latestBuild);
   }
 

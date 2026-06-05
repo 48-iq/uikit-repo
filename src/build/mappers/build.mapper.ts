@@ -2,10 +2,9 @@ import { Build } from 'src/postgres/entities/build.entity';
 import { BuildCursorResultDto } from '../dto/build-cursor-result.dto';
 import { BuildEntityDto } from '../dto/build-entity.dto';
 import { BuildEntityResultDto } from '../dto/build-entity-result.dto';
-import { ComponentBuild } from 'src/postgres/entities/component-build.entity';
 
 export class BuildMapper {
-  static toEntityDto(build: Build, componentBuilds?: ComponentBuild[]): BuildEntityDto {
+  static toEntityDto(build: Build): BuildEntityDto {
     const dto = new BuildEntityDto();
     dto.id = build.id;
     dto.createdAt = build.startedAt?.toISOString() ?? '';
@@ -16,17 +15,19 @@ export class BuildMapper {
     dto.startedAt = build.startedAt?.toISOString() ?? '';
     dto.finishedAt = build.finishedAt?.toISOString() ?? '';
     dto.repoId = build.repo?.id ?? '';
-    dto.componentBuilds = componentBuilds?.map((cb) => ({
+    dto.componentBuilds = build.componentBuilds?.map((cb) => ({
       componentId: cb.componentId,
+      buildId: cb.componentBuildId,
       name: cb.componentName,
       username: cb.componentUsername,
       version: cb.buildVersion,
-    }))
+    }));
+
     return dto;
   }
 
-  static toEntityResultDto(build: Build, componentBuilds?: ComponentBuild[]): BuildEntityResultDto {
-    return { success: true, result: this.toEntityDto(build, componentBuilds) };
+  static toEntityResultDto(build: Build): BuildEntityResultDto {
+    return { success: true, result: this.toEntityDto(build) };
   }
 
   static toCursorResultDto(args: {

@@ -17,6 +17,7 @@ import { BuildListEntityDto, BuildListResultDto } from '../dto/component-build-a
 import { BuildMapper } from '../mappers/build.mapper';
 import { BuildLogService } from './build-log.service';
 import { RollupBuildService } from './rollup-build.service';
+import { Load } from 'src/postgres/entities/load.entity';
 
 @Injectable()
 export class BuildService {
@@ -30,6 +31,8 @@ export class BuildService {
     private readonly rollupBuildService: RollupBuildService,
     private readonly buildLogService: BuildLogService,
     private readonly config: ConfigService,
+    @InjectRepository(Load)
+    private readonly loadRepository: Repository<Load>,
     @InjectMinio() private readonly minio: MinioClient,
   ) {}
 
@@ -69,6 +72,7 @@ export class BuildService {
         componentName: item.name,
         componentUsername: item.username,
         buildVersion: item.version,
+        packageFilename: item.packageFilename ?? '',
         build,
       })),
     );
@@ -86,7 +90,7 @@ export class BuildService {
       relations: ['repo', 'componentBuilds'],
     });
     if (!build) throw new AppError(ERROR_CODE.BUILD_NOT_FOUND);
-    return BuildMapper.toEntityResultDto(build, build.componentBuilds);
+    return BuildMapper.toEntityResultDto(build);
   }
 
   async getByFilters(dto: BuildFiltersDto) {
@@ -121,6 +125,8 @@ export class BuildService {
   async getPackage(buildId: string) {
     const build = await this.buildRepository.findOneBy({ id: buildId });
     if (!build) throw new AppError(ERROR_CODE.BUILD_NOT_FOUND);
+    await this.loadRepository.save({ build });
+
     return this.minio.getObject(MINIO_REPOSITORIES_BUCKET, build.id);
   }
 
