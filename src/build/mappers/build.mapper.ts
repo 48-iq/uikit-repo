@@ -11,6 +11,7 @@ export class BuildMapper {
     dto.updatedAt = build.updatedAt?.toISOString() ?? '';
     dto.status = build.status;
     dto.version = build.version;
+    dto.name = build.repo?.name ?? '';
     dto.logs = build.logs ?? '';
     dto.startedAt = build.startedAt?.toISOString() ?? '';
     dto.finishedAt = build.finishedAt?.toISOString() ?? '';

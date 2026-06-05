@@ -8,6 +8,7 @@ export class BuildEntityDto extends EntityDto {
   logs: string;
   startedAt: string;
   finishedAt: string;
+  name: string;
   repoId: string;
   componentBuilds?: ComponentBuildEntityDto[];
 }

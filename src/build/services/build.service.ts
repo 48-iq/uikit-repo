@@ -94,7 +94,7 @@ export class BuildService {
   }
 
   async getByFilters(dto: BuildFiltersDto) {
-    const { repoId, username, status, skip = 0, limit = 10 } = dto;
+    const { repoId, username, status, query, skip = 0, limit = 10 } = dto;
     const startDate = dto.startDate ? new Date(dto.startDate) : new Date();
 
     let qb = this.buildRepository
@@ -105,6 +105,12 @@ export class BuildService {
 
     if (repoId) qb = qb.andWhere('repo.id = :repoId', { repoId });
     if (username) qb = qb.andWhere('repo.username = :username', { username });
+
+    if (query) {
+      qb = qb.andWhere('LOWER(repo.name) LIKE :query', {
+        query: `%${query.toLowerCase()}%`,
+      });
+    }
 
     qb = qb.orderBy('build.version', 'DESC');
 
